@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>aespam - AI 스마트팜</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    overflow-x: hidden;
+  }
+
+  /* ===== 헤더 ===== */
+  header {
+    background: #003366;
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .logo {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  nav {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: 6px;
+    transition: background 0.3s;
+  }
+  nav button:hover:not(.disabled),
+  nav button.active {
+    background: #005599;
+  }
+  nav button.disabled {
+    color: #999;
+    cursor: default;
+  }
+
+  /* ===== 메인 배너 ===== */
+  .slider {
+    width: 100%;
+    height: 280px;
+    background: url('background.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    text-shadow: 2px 2px 6px #000;
+  }
+
+  /* ===== 콘텐츠 공통 ===== */
+  main {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .content {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    padding: 40px 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 20px;
+    line-height: 1.8;
+  }
+
+  .content.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  footer {
+    background: #eee;
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    color: #555;
+  }
+
+  /* ===== 홈 게시판 ===== */
+  .board {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+  }
+  .board-box {
+    background: white;
+    width: 300px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    text-align: left;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    border-radius: 8px;
+  }
+  .board-box h4 { margin-bottom: 10px; font-size: 18px; }
+  .board-box ul {
+    list-style: none;
+    padding: 0;
+    font-size: 16px;
+  }
+
+  /* ===== 회사소개 세로 갤러리 ===== */
+  .company-gallery {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 60px;
+    margin-top: 40px;
+  }
+  .company-gallery img {
+    width: 90%;
+    height: auto;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  }
+
+  /* ===== 제품소개 이미지 섹션 ===== */
+  .product-gallery {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 60px;
+    margin-top: 40px;
+  }
+  .product-gallery img {
+    width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  }
+
+  /* ===== 로딩 오버레이 ===== */
+  #loadingOverlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: white;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #003366;
+    font-weight: bold;
+  }
+  #loadingOverlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ===== 반응형 (아이패드 중심) ===== */
+  @media (max-width: 1200px) {
+    .slider { height: 240px; font-size: 24px; }
+    .company-gallery img, .product-gallery img { width: 95%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">에스팜 (aespam)</div>
+  <nav>
+    <button onclick="menuClick(event,'home')" class="active">홈</button>
+    <button onclick="menuClick(event,'company')">회사소개</button>
+    <button onclick="menuClick(event,'team')">임원소개</button>
+    <button onclick="menuClick(event,'products')">제품소개</button>
+    <button class="disabled">기술/서비스 소개</button>
+    <button class="disabled">채용안내</button>
+    <button class="disabled">고객문의</button>
+    <button class="disabled">오시는길</button>
+  </nav>
+</header>
+
+<div class="slider">
+  Bringing Nature into Your Life,<br>Technology into Nature.
+</div>
+
+<div id="loadingOverlay">Loading...</div>
+
+<main>
+  <!-- 홈 -->
+  <section id="home" class="content active">
+    <h2>환영합니다</h2>
+    <p>에스팜은 AI 기반의 개인 맞춤형 스마트팜을 통해<br>
+    지속 가능한 미래 농업을 제안합니다.</p>
+
+    <div class="board">
+      <div class="board-box">
+        <h4>공지사항</h4>
+        <ul>
+          <li>✅ 스마트팜 시제품 출시 예정 (2025.11)</li>
+          <li>📢 채용설명회 일정 안내</li>
+          <li>🔧 시스템 점검 예정 (2025.10.30)</li>
+        </ul>
+      </div>
+      <div class="board-box">
+        <h4>Q&A</h4>
+        <ul>
+          <li>Q. 어떤 작물이 가능한가요?</li>
+          <li>Q. 설치는 어떻게 하나요?</li>
+          <li>Q. 가격은 얼마인가요?</li>
+        </ul>
+      </div>
+      <div class="board-box">
+        <h4>홍보자료</h4>
+        <ul>
+          <li>📸 스마트팜 실제 설치 사례</li>
+          <li>📽️ 유튜브 영상 바로가기</li>
+          <li>📰 보도자료 모음</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 회사소개 -->
+  <section id="company" class="content">
+    <h2>회사소개</h2>
+    <div class="company-gallery">
+      <img src="hssg1.jpg" alt="회사소개 이미지1">
+      <img src="hssg2.jpg" alt="회사소개 이미지2">
+      <img src="hssg3.jpg" alt="회사소개 이미지3">
+      <img src="hssg4.jpg" alt="회사소개 이미지4">
+      <img src="hssg5.jpg" alt="회사소개 이미지5">
+      <img src="hssg6.jpg" alt="회사소개 이미지6">
+      <img src="hssg7.jpg" alt="회사소개 이미지7">
+    </div>
+    <p style="margin-top:40px;">2025년 10월 17일 설립, 대전광역시 유성구 대덕대로556번길 158에 위치</p>
+  </section>
+
+  <!-- 임원소개 -->
+  <section id="team" class="content">
+    <h2>임원소개</h2>
+    <p>대표이사: 문준서</p>
+    <p>이사: 백기현, 신희원, 박소언</p>
+  </section>
+
+  <!-- 제품소개 -->
+  <section id="products" class="content">
+    <h2>제품소개 - AI 스마트팜</h2>
+    <div class="product-gallery">
+      <img src="hssg3.jpg" alt="제품소개 이미지1">
+      <img src="hssg5.jpg" alt="제품소개 이미지2">
+    </div>
+  </section>
+</main>
+
+<footer>
+  ⓒ 2025 에스팜(aespam). All rights reserved.
+</footer>
+
+<script>
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  let currentSection = 'home';
+
+  function menuClick(event, id) {
+    if (id === currentSection) return;
+    loadingOverlay.classList.add('visible');
+
+    const currentEl = document.getElementById(currentSection);
+    const nextEl = document.getElementById(id);
+
+    currentEl.classList.remove('active');
+    setTimeout(() => {
+      nextEl.classList.add('active');
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      currentSection = id;
+      loadingOverlay.classList.remove('visible');
+    }, 400);
+  }
+</script>
+
+</body>
+</html>
